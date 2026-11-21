@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Publicar Noticia - U.E. Cotopaxi</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background: #eef2f5; }
+        header { background: #003366; color: #fff; padding: 15px; text-align: center; }
+        .caja { max-width: 600px; margin: 20px auto; background: #fff; padding: 20px; border-radius: 6px; }
+        input, select, textarea { width: 100%; padding: 10px; margin: 8px 0 15px 0; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        button { width: 100%; background: #28a745; color: #fff; border: none; padding: 12px; font-size: 16px; border-radius: 4px; cursor: pointer; }
+        .aviso { background: #fff3cd; color: #856404; padding: 10px; font-size: 13px; border-radius: 4px; margin-bottom: 15px; }
+        .error-filtro { background: #f8d7da; color: #721c24; padding: 12px; font-size: 14px; border-radius: 4px; margin-bottom: 15px; font-weight: bold; border: 1px solid #f5c6cb; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h2>Publicar Noticia del Plantel</h2>
+    <a href="/" style="color: #ffd700;">← Volver al muro de noticias</a>
+</header>
+
+<div class="caja">
+    <div class="aviso">🛡️ <strong>Sistema moderado:</strong> Respeta las normas de convivencia. Tu borrador se guarda automáticamente ante cortes de luz.</div>
+
+    {% if error_filtro %}
+        <div class="error-filtro">{{ error_filtro }}</div>
+    {% endif %}
+    
+    <form method="POST" enctype="multipart/form-data" id="formNoticia">
+        <label>Tu Nombre y Curso/Cargo (Ej. Juan Pérez - 3ro BGU):</label>
+        <input type="text" name="autor" id="autor" required>
+
+        <label>Título de la Noticia:</label>
+        <input type="text" name="titulo" id="titulo" required>
+
+        <label>Tipo de Comunicado:</label>
+        <select name="categoria" id="categoria">
+            <option value="Noticia Escolar">Noticia Escolar</option>
+            <option value="Emergencia / Clima">Emergencia / Clima</option>
+            <option value="Circular Oficial">Circular Oficial</option>
+            <option value="Actividad / Evento">Actividad / Evento</option>
+        </select>
+
+        <label>Detalle de la noticia:</label>
+        <textarea name="contenido" id="contenido" rows="5" required></textarea>
+
+        <label>📷 Foto de evidencia (opcional - cámara o galería):</label>
+        <input type="file" name="foto" accept="image/*">
+
+        <button type="submit">Publicar Noticia Ahora</button>
+    </form>
+</div>
+
+<script>
+    const campos = ["autor", "titulo", "contenido"];
+    campos.forEach(id => {
+        const el = document.getElementById(id);
+        if (localStorage.getItem("borrador_" + id)) {
+            el.value = localStorage.getItem("borrador_" + id);
+        }
+        el.addEventListener("input", () => {
+            localStorage.setItem("borrador_" + id, el.value);
+        });
+    });
+
+    document.getElementById("formNoticia").addEventListener("submit", () => {
+        campos.forEach(id => localStorage.removeItem("borrador_" + id));
+    });
+</script>
+
+</body>
+</html>

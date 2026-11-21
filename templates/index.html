@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>U.E. Fiscal Provincia de Cotopaxi</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background: #eef2f5; color: #222; }
+        header { background: #003366; color: #fff; padding: 18px; text-align: center; }
+        .barra { background: #002244; padding: 12px; text-align: center; }
+        .btn-subir { background: #28a745; color: white; padding: 10px 18px; text-decoration: none; border-radius: 5px; font-weight: bold; }
+        .contenedor { max-width: 850px; margin: 20px auto; padding: 0 15px; }
+        .noticia { background: #fff; padding: 18px; margin-bottom: 15px; border-radius: 6px; border-left: 5px solid #003366; }
+        .meta { font-size: 13px; color: #555; margin-bottom: 8px; }
+        .tag { background: #0055a5; color: #fff; padding: 2px 8px; border-radius: 3px; font-weight: bold; }
+        .borrar { background: none; border: none; color: #c0392b; font-size: 12px; cursor: pointer; float: right; text-decoration: underline; }
+        .foto-evidencia { max-width: 100%; max-height: 420px; border-radius: 6px; margin-top: 10px; display: block; border: 1px solid #ddd; }
+        footer { text-align: center; padding: 20px; font-size: 13px; color: #666; }
+        .btn-mod { background: none; border: 1px solid #888; color: #444; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .panel-activo { background: #d4edda; color: #155724; padding: 8px 12px; border-radius: 4px; display: inline-block; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>U.E. Fiscal "Provincia de Cotopaxi"</h1>
+    <p>Sistema Comunitario de Noticias (Online / Offline)</p>
+</header>
+
+<div class="barra">
+    <a href="/publicar" class="btn-subir">+ Subir Nueva Noticia o Comunicado</a>
+</div>
+
+<div class="contenedor">
+    {% if not comunicados %}
+        <div class="noticia">No hay noticias publicadas aún. ¡Sé el primero en subir un comunicado!</div>
+    {% endif %}
+
+    {% for item in comunicados %}
+    <div class="noticia">
+        {% if es_moderador or (token_actual and item.token_dispositivo == token_actual) %}
+        <form method="POST" action="/eliminar/{{ item.id }}" style="display:inline;" onsubmit="return confirm('¿Seguro que deseas eliminar esta publicación?')">
+            <button type="submit" class="borrar">Eliminar</button>
+        </form>
+        {% endif %}
+
+        <div class="meta">
+            <span class="tag">{{ item.categoria }}</span> | Por: <strong>{{ item.autor }}</strong> | {{ item.fecha }}
+        </div>
+        <h3>{{ item.titulo }}</h3>
+        <p>{{ item.contenido }}</p>
+
+        {% if item.foto %}
+            <img src="{{ url_for('static', filename='uploads/' + item.foto) }}" alt="Evidencia" class="foto-evidencia">
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+
+<footer>
+    {% if es_moderador %}
+        <div class="panel-activo">
+            Modo {{ rol_actual | upper }} activo (puedes moderar todas las noticias) — 
+            <a href="/salir" style="color: #721c24; font-weight: bold;">Cerrar modo moderador</a>
+        </div>
+    {% else %}
+        <form method="POST" action="/acceso" id="formMod" style="display:inline;">
+            <input type="hidden" name="clave" id="claveMod">
+            <button type="button" class="btn-mod" onclick="activarModerador()">Acceso Docente / Admin</button>
+        </form>
+    {% endif %}
+</footer>
+
+<script>
+    function activarModerador() {
+        const clave = prompt("Ingrese clave de Docente o Administrador:");
+        if (clave && clave.trim() !== "") {
+            document.getElementById("claveMod").value = clave;
+            document.getElementById("formMod").submit();
+        }
+    }
+</script>
+
+</body>
+</html>
